@@ -2,33 +2,30 @@
 
 A small, dependency-free Python library for turning Statista and LexisNexis/Moreover JSON responses into typed domain objects.
 
-## LexisNexis AI-safe ingestion
+## Ingestion
 
-Use `ingest_lexisnexis` for AI workflows. It filters the raw response before creating objects and **fails closed**: only records whose `approvedForAdvancedAiUsage` value is explicitly true are returned. The API's string values (`"true"`/`"false"`) and boolean values are supported.
+Use `ingest_lexisnexis` for AI workflows. It filters the raw response before creating objects and **fails closed**: only records whose `approvedForAdvancedAiUsage` value is explicitly true are returned.
 
 ```python
-from research_objects import ingest_lexisnexis
+from research_objects import ingest_lexisnexis, ingest_statista
 
 articles = ingest_lexisnexis(lexisnexis_response)
+statistics = ingest_statista(statista_response)
 ```
 
-To include non-approved records for an audit or non-AI workflow, opt out explicitly:
+`ingest_statista` supports the `items` responses used by the statistics and market-insights endpoints, the `results` response used by consumer insights, and a single result object. All Statista records are included by default. To retain only records explicitly marked as premium, use:
 
 ```python
-articles = ingest_lexisnexis(lexisnexis_response, approved_only=False)
+premium_statistics = ingest_statista(statista_response, premium_only=True)
 ```
 
-`parse_lexisnexis` remains available as an unfiltered parser. For AI ingestion, use `ingest_lexisnexis` so records without approval are not accidentally processed.
-
-## Statista
+To include non-approved LexisNexis records for an audit or non-AI workflow, opt out explicitly:
 
 ```python
-from research_objects import parse_statista
-
-statistics = parse_statista(statista_response)
+audit_articles = ingest_lexisnexis(lexisnexis_response, approved_only=False)
 ```
 
-The parsers accept collection responses and single objects. The original API payload is retained on every object as `.raw`, while common fields are normalized into `Article` and `Statistic` dataclasses. The library does not make HTTP requests and therefore does not require API credentials.
+The lower-level `parse_lexisnexis` and `parse_statista` functions remain available when no ingestion policy is needed. The original API payload is retained on every object as `.raw`.
 
 ## Development
 
