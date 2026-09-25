@@ -17,7 +17,11 @@ def _payloads(payload: Mapping[str, Any], key: str) -> list[Mapping[str, Any]]:
 
 
 def parse_lexisnexis(payload: Mapping[str, Any]) -> list[Article]:
-    """Parse a LexisNexis/Moreover response into :class:`Article` objects."""
+    """Parse a LexisNexis/Moreover response without applying licensing filters.
+
+    For AI ingestion, prefer :func:`research_objects.ingest_lexisnexis`, which
+    excludes records that are not approved for advanced AI usage.
+    """
     return [Article.from_dict(item) for item in _payloads(payload, "articles")]
 
 
